@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
 import { CodeInterpreter } from '@e2b/code-interpreter';
 import xlsx from 'xlsx';
+import { protect } from '../middleware/auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,8 +20,8 @@ const upload = multer({
   }
 });
 
-// Analyze uploaded file
-router.post('/', upload.single('file'), async (req, res) => {
+// Analyze uploaded file (protected)
+router.post('/', protect, upload.single('file'), async (req, res) => {
   let sandbox = null;
 
   try {

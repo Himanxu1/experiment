@@ -5,8 +5,11 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
+import 'reflect-metadata';
+import AppDataSource from './config/data-source.js';
 import uploadRouter from './routes/upload.js';
 import analyzeRouter from './routes/analyze.js';
+import authRouter from './routes/auth.js';
 
 // Load environment variables
 dotenv.config();
@@ -35,6 +38,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Excel Analytics API is running' });
 });
 
+app.use('/api/auth', authRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/analyze', analyzeRouter);
 
@@ -47,8 +51,18 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
-  console.log(`📊 API endpoints available at http://localhost:${PORT}/api`);
-});
+// Initialize database and start server
+AppDataSource.initialize()
+  .then(() => {
+    console.log('✅ Database connected successfully');
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+      console.log(`📊 API endpoints available at http://localhost:${PORT}/api`);
+      console.log(`🔐 Authentication endpoints: /api/auth/signup, /api/auth/login`);
+    });
+  })
+  .catch((error) => {
+    console.error('❌ Database connection failed:', error);
+    process.exit(1);
+  });

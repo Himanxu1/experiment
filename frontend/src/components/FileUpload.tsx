@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import axios from 'axios'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface FileUploadProps {
   onAnalysisComplete: (data: any) => void
@@ -11,6 +12,7 @@ interface FileUploadProps {
 
 export default function FileUpload({ onAnalysisComplete, onAnalysisStart }: FileUploadProps) {
   const [error, setError] = useState<string | null>(null)
+  const { token } = useAuth()
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) return
@@ -27,16 +29,18 @@ export default function FileUpload({ onAnalysisComplete, onAnalysisStart }: File
       const response = await axios.post(`${apiUrl}/api/analyze`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`,
         },
       })
 
       onAnalysisComplete(response.data)
     } catch (err: any) {
       console.error('Upload error:', err)
-      setError(err.response?.data?.message || 'Failed to analyze file. Please try again.')
+      const errorMessage = err.response?.data?.message || 'Failed to analyze file. Please try again.'
+      setError(errorMessage)
       onAnalysisComplete(null)
     }
-  }, [onAnalysisComplete, onAnalysisStart])
+  }, [onAnalysisComplete, onAnalysisStart, token])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
