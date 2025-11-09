@@ -240,9 +240,9 @@ print(json.dumps(result))
         }
       }
 
-      // Close sandbox
-      await sandbox.close();
-      console.log('✅ Sandbox closed');
+      // Kill sandbox
+      await sandbox.kill();
+      console.log('✅ Sandbox terminated');
 
       res.json({
         success: true,
@@ -263,9 +263,9 @@ print(json.dumps(result))
       console.error('❌ E2B analysis error:', e2bError);
       if (sandbox) {
         try {
-          await sandbox.close();
+          await sandbox.kill();
         } catch (e) {
-          console.error('Error closing sandbox:', e);
+          console.error('Error killing sandbox:', e);
         }
       }
       // Fall back to basic analysis
@@ -289,9 +289,9 @@ print(json.dumps(result))
     console.error('Analysis error:', error);
     if (sandbox) {
       try {
-        await sandbox.close();
+        await sandbox.kill();
       } catch (e) {
-        console.error('Error closing sandbox:', e);
+        console.error('Error killing sandbox:', e);
       }
     }
     res.status(500).json({
