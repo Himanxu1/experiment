@@ -2,11 +2,12 @@ import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 import fs from 'fs/promises';
-import e2bPkg from '@e2b/code-interpreter';
 import xlsx from 'xlsx';
 
-const { CodeInterpreter } = e2bPkg;
+const require = createRequire(import.meta.url);
+const { CodeInterpreter } = require('@e2b/code-interpreter');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
